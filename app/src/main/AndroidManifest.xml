@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- FOREGROUND_SERVICE_SPECIAL_USE is for Android 14 (API 34) and above -->
+    <!-- You'll need to declare this in Play Console if you target API 34+ and use this type -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 
     <application
@@ -14,12 +18,34 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Dynamicisland"
-        tools:targetApi="31">
+        tools:targetApi="34"> <!-- Or your highest target API -->
+
+        <!--
+            For Android 14 (API 34) and above using FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            If you support older versions (API 29-33) and this service might run there,
+            you may need to declare other foregroundServiceTypes here OR handle type selection
+            carefully in code, as "specialUse" attribute is only for API 34+.
+            Example:
+            android:foregroundServiceType="specialUse|dataSync"
+            Then in code for API 29-33, you'd use ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        -->
         <service
             android:name=".OverlayService"
-            android:exported="false"
-            android:permission="android.permission.FOREGROUND_SERVICE"
-            android:foregroundServiceType="specialUse"/>
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true"
+            android:foregroundServiceType="specialUse">
+
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service> <!-- foregroundServiceType attribute requires API 29+ -->
+        <!-- Note: "specialUse" type in manifest is for API 34+. -->
+        <!-- If targeting API < 34, you might need other types here or careful code handling. -->
+
 
         <activity
             android:name=".MainActivity"
@@ -27,7 +53,6 @@
             android:theme="@style/Theme.Dynamicisland">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
