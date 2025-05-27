@@ -8,5 +8,6 @@ class OverlayAPI {
         setInfo(context)
     }
     public fun setInfo(layout: RichInfo) {
+        // Generate an xml of the notch shape with the text/images. Needs animation support.
     }
 }
